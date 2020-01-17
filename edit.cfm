@@ -46,6 +46,21 @@
 		<th class="form"><span class="text10_red">*</span>　<cfoutput>#Session.termObj.get_term('eLM_admin_user_list_first_name')#</cfoutput></th>
 		<td class="form"><cfinput name="first_name_tx" type="text" size="30" value=#data_select.first_name#/></td>
 	</tr>
+	<!--- 姓（ふりがな） --->
+	<tr>
+		<th class="form"><span class="text10_red">*</span>　<cfoutput>#Session.termObj.get_term('eLM_admin_user_list_last_name_kana')#</cfoutput></th>
+		<td class="form"><cfinput name="last_name_furi_tx" type="text" size="30" value=#data_select.last_name_furi#/></td>
+	</tr>
+	<!--- 名（ふりがな） --->
+	<tr>
+		<th class="form"><span class="text10_red">*</span>　<cfoutput>#Session.termObj.get_term('eLM_admin_user_list_first_name_kana')#</cfoutput></th>
+		<td class="form"><cfinput name="first_name_furi_tx" type="text" size="30" value=#data_select.first_name_furi#/></td>
+	</tr>
+	<!--- メールアドレス --->
+	<tr>
+		<th class="form"><cfoutput>#Session.termObj.get_term('eLM_admin_user_list_mailaddress')#</cfoutput></th>
+		<td class="form"><cfinput name="mailaddress_tx" type="text" size="30" value=#data_select.mailaddress#/></td>
+	</tr>
 	<!--- 利用状況 --->
 	<tr>
 		<th class="form"><span class="text10_red">*</span>　<cfoutput>#Session.termObj.get_term('eLM_admin_user_edit_use_state:ja=利用状況')#</cfoutput></th>
@@ -56,7 +71,7 @@
 	</tr>
 </table>
 <br>
-<cfinput name="write_submit" value="更新" type="submit"/>  <cfinput name="back_submit" value="戻る" type="submit"/>
+<cfinput name="write_submit" value="登録" type="submit"/>  <cfinput name="back_submit" value="戻る" type="submit"/>
 
 <!--- ★★戻るボタン押下★★ --->
 <cfif isDefined("form.back_submit")>
@@ -67,14 +82,33 @@
 <cfif isDefined("form.write_submit")>
 	<!--- 画面情報を保持 --->
 	<cfset temp_struct = StructNew()>
+	<cfset temp_struct.logon = "#form.logon_tx#">
 	<cfset temp_struct.last_name = "#form.last_name_tx#">
 	<cfset temp_struct.first_name = "#form.first_name_tx#">
+	<cfset temp_struct.last_name_furi = "#form.last_name_furi_tx#">
+	<cfset temp_struct.first_name_furi = "#form.first_name_furi_tx#">
+	<cfset temp_struct.mailaddress = "#form.mailaddress_tx#">
 	<cfif form.flag_stop eq 0>
 		<cfset temp_struct.flag_stop = flag_stop_off>
 	<cfelseif form.flag_stop eq 1>
 		<cfset temp_struct.flag_stop = flag_stop_on>
 	</cfif>
-	<cfset ret = dao_update_ex("#application.DSN#", "USER_MASTER", "#variables.serial#", temp_struct, "user_id")>
+	
+	<!--- 登録処理 --->
+	<cfif #variables.serial# eq ''>
+		<!--- 新規登録 --->
+		<cfinvoke
+			component="#SERVICE_ADDRESS#.u_regist"
+			method="New_registration"
+			returnVariable="new_user_id"
+		>
+		<cfset temp_struct.user_id = new_user_id>
+		<cfset dao_put("USER_MASTER",temp_struct,"user_id")>
+	<cfelse>
+		<!--- 前画面から引き継いだシリアル情報が存在すれば更新 --->
+		<cfset dao_update_ex("#application.DSN#", "USER_MASTER", "#variables.serial#", temp_struct, "user_id")>
+	</cfif>
+	
 	<!--- 更新後トップ画面へ戻る --->
 	<cflocation url="top.cfm">
 </cfif>

@@ -14,7 +14,7 @@
 
 
 <!--- ★★ 検索条件 ★★ --->
-<table border="1">
+<table>
     <tr>
         <b>◆検索条件◆</b>
     </tr>
@@ -32,12 +32,8 @@
 			<!---<input name="sw" type="text" style="width:200px; margin-left: 10px;" value="<cfoutput>#HTMLeditformat(sw)#</cfoutput>">--->
 		</td>
 	</tr>
-    <tr>
-        <td colspan ="2" align = "left">
-            <cfinput name="search_submit" value="再検索" type="submit"/>
-        </td> 
-    </tr>
-</table>
+</table><br>
+<cfinput name="search_submit" value="再検索" type="submit"/>
 <br>
 
 <!--- ★★ユーザー検索★★ --->
@@ -51,6 +47,13 @@
     </cfif>
 </cfif>
 <!---<cfdump var="#Variables.TempSelectObj#">--->
+
+<!--- ★★ 新規登録時 ★★ --->
+<cfif isDefined("form.new")>
+    <cflocation url="edit.cfm">
+</cfif>
+
+
 
 <!--- result取得 --->
 <cfset q_user = dao_result("#Application.dsn#", Variables.TempSelectObj)>
@@ -95,8 +98,8 @@
 </table>
 
 <br>
-<br>
-<br>
+<cfinput name="new" value="新規登録" type="submit"/><br>
+<b>※Inssert自体はできるが、必要事項を全て入力しているわけではないので整合性はとれていない。非推奨</b>
 <!---
 <cfoutput><strong>↓検索結果dump↓</strong></cfoutput>
 <cfdump var = #q_user#>
